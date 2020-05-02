@@ -47,7 +47,7 @@ def play_hangman():
 
             print("you have",guesses_left,"guesses left")
 
-            if len([x for x in guessed_letters if x in word])==len(word):#"all the letters in the word have been guessed"
+            if len([x for x in word if x not in guessed_letters])==0:#"all the letters in the word have been guessed"
                 done=True #"set done to be true and tell the user they won!"
                 print('you win!')
             elif guesses_left==0:
