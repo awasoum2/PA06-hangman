@@ -4,9 +4,19 @@
 """
 import random
 def generate_random_word():
-    Words="angry hungry money school".split()
+    Words="school".split()
+    # Words="angry hungry money school".split()
     return random.choice(Words)
 # print(generate_random_word())
+
+def get_word_so_far(word,guessed_letters):
+    remains=[]
+    for x in word:
+        if x in guessed_letters:
+            remains.append(x)
+        else:
+            remains.append('-')
+    return ''.join(remains)
 
 def print_word(word,guessed_letters):
     remains=[]

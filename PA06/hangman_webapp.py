@@ -9,38 +9,65 @@ app = Flask(__name__)
 
 global state
 state = {'guesses':[],
-         'word':"interesting",
-		 'word_so_far':"-----------",
+         'word':'interesting',
+		 'word_so_far':'-----',
 		 'done':False}
 
 @app.route('/')
 @app.route('/main')
 def main():
-	return render_template('hangman.html')
+    return render_template('hangman.html')
+
+
 
 @app.route('/start')
-def play():
-	global state
-	state['word']=hangman_app.generate_random_word()
-	state['guesses'] = []
-	return render_template("start.html",state=state)
+def start():
+    global state
+    state['word']=hangman_app.generate_random_word()
+    state['guesses'] = []
+    word_so_far=hangman_app.get_word_so_far(state['word'],state['guesses'])
+    state['word_so_far']=word_so_far
+
+    return render_template("start.html",state=state)
 
 @app.route('/play',methods=['GET','POST'])
 def hangman():
-	""" plays hangman game """
-	global state
-	if request.method == 'GET':
-		return play()
+    """ plays hangman game """
+    global state
 
-	elif request.method == 'POST':
-		letter = request.form['guess']
-		# check if letter has already been guessed
-		# and generate a response to guess again
-		# else check if letter is in word
-		# then see if the word is complete
-		# if letter not in word, then tell them
-		state['guesses'] += [letter]
-		return render_template('play.html',state=state)
+    if request.method == 'GET':
+    	return play()
+
+    elif request.method == 'POST':
+        guesses_left=len(state['word'])
+        letter = request.form['guess']
+        if letter in state['guesses']:#check if letter has already been guessed
+            guesses_left-=1
+            print("you've already guessed it")# and generate a response to guess again
+        elif letter not in state['word']:# else check if letter is in word
+            print("the letter is not in the word")
+            state['guesses'] += [letter]
+            guesses_left-=1
+        else:
+            print("the letter is in the word")
+            state['guesses'] += [letter]
+
+        if len([x for x in state['word'] if x not in state['guesses']])==0:#"all the letters in the word have been guessed"
+            # done=True #"set done to be true and tell the user they won!"
+            print('you win!')
+
+        elif guesses_left==0:
+            # done=True
+            print('you lost')#"set done to be true and tell the user they lost!"
+        else:
+            # print_word(word,guessed_letters)
+            word_so_far=hangman_app.get_word_so_far(state['word'],state['guesses'])
+            state['word_so_far']=word_so_far
+            letter = request.form['guess']
+        # then see if the word is complete
+        # if letter not in word, then tell them
+        # state['guesses']+=[letter]
+        return render_template('play.html',state=state)
 
 
 
